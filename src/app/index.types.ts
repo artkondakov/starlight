@@ -1,11 +1,21 @@
 import jsonLogic from "json-logic";
 import React from "react";
 
-export type onCloseCallback = (showAgain: boolean) => any;
+export type rules = jsonLogic.RulesLogic<jsonLogic.AdditionalOperation>;
+
+export interface PopupProps {
+  onClose: (options: onCloseOptions) => void;
+}
+
+export interface onCloseOptions {
+  showsNumber?: number;
+  showInterval?: number;
+  showAgain?: boolean;
+}
 
 export interface Popup {
-  rules: jsonLogic.RulesLogic<jsonLogic.AdditionalOperation>;
-  popup: (onClose: onCloseCallback) => React.FunctionComponent<any>;
+  rules: rules;
+  popup: React.FC<PopupProps>,
   id: string;
   
   startsAt?: Date | string;
@@ -14,11 +24,9 @@ export interface Popup {
   showsInterval?: number;
 }
 
-export interface HydratedPopup extends Popup {
-  SLonClose: (showAgain: boolean) => any;
-}
+export interface HydratedPopup extends Popup, PopupProps {}
 
 export interface AppProps {
-  popups?: Popup[];
-  rules?: jsonLogic.RulesLogic<jsonLogic.AdditionalOperation>;
+  popups: Popup[];
+  rules?: rules;
 }

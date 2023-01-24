@@ -1,7 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
 const rules = require('./webpack.rules');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
 module.exports = {

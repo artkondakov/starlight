@@ -5,8 +5,7 @@ module.exports = [
     test: /\.tsx?$/,
     use: 'ts-loader',
     include: [
-      path.resolve(__dirname, '..', 'src'),
-      path.resolve(__dirname, '..', 'demo'),
+      path.resolve(__dirname, '..', 'src')
     ],
     exclude: /node_modules/,
   },

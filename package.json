@@ -15,7 +15,7 @@
     "./package.json": "./package.json"
   },
   "scripts": {
-    "start": "webpack serve --mode=development --open --progress --profile --color",
+    "dev": "webpack serve --mode=development --open --progress --profile --color",
     "build": "rimraf dist && webpack --profile --color --mode=production",
     "lint": "eslint src --ext .js --cache",
     "lint:staged": "eslint --ext .js --config .eslintrc.js",

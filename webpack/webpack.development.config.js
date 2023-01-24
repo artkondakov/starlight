@@ -4,7 +4,7 @@ const rules = require('./webpack.rules');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: path.resolve(__dirname, '..', 'demo', 'index.tsx'),
+  entry: path.resolve(__dirname, '..', 'src', 'demo', 'index.tsx'),
   output: {
     path: path.join(__dirname, '..', 'dist'),
     filename: 'starlight.dev.js',
@@ -37,8 +37,8 @@ module.exports = {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new HtmlWebpackPlugin({
-      title: 'Supernova dev',
-      template: './demo/index.html',
+      title: 'Starlight playground',
+      template: './src/demo/index.html',
       templateParameters: {
         mode: 'development',
       },

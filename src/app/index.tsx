@@ -1,10 +1,10 @@
-import { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { AppProps } from './index.types';
 import RulesWatcher from '../watchers';
 import { getStorageAccessPermission } from './utils';
 import jsonLogic from '../json-logic';
 
-import { Popup, HydratedPopup } from './index.types';
+import { Popup, HydratedPopup, onCloseOptions } from './index.types';
 import {
   BLOCK_POPUPS_ALL,
   POPUP_WAS_DISMISSED,
@@ -15,7 +15,7 @@ import { LocalStorageManager } from '../storage-managers';
 import { pushToDL } from '../utils';
 
 const Starlight: FC<AppProps> = ({
-  // After recieving popups map them, add unique id to each and use this id as param to SLonClose
+  // After recieving popups map them, add unique id to each and use this id as param to onClose
   popups = [],
   rules = {},
 }) => {
@@ -25,7 +25,7 @@ const Starlight: FC<AppProps> = ({
       const hp: HydratedPopup = {
         ...p,
         id: (p.id.match(/\w/gm) || [`SLpopup${i + 1}`]).join(''),
-        SLonClose: (showAgain: boolean = false) => closePopupByid(p.id, showAgain),
+        onClose: (options) => closePopupByid(p.id, options),
       };
       return hp;
     }),
@@ -34,7 +34,6 @@ const Starlight: FC<AppProps> = ({
   const [blockedByPopup, setBlockedByPopup] = useState<boolean>(false);
   const [blockedBySameRoute, setBlockedByRoute] = useState<boolean>(false);
   const [prevUrl, setPrevUrl] = useState<string>('');
-  console.log(popups, rules);
 
   useEffect(() => {
     getStorageAccessPermission();
@@ -81,14 +80,13 @@ const Starlight: FC<AppProps> = ({
     // isNaN(attemptsLeft) === true: this popup was never shown before, show it now
     if (!hasAttemptsBlock && (isNaN(attemptsLeft) || attemptsLeft) && !blockedByBrand) {
       setBlockedByRoute(true);
-      // setContentInaccessible();
       setVisPopup(popup);
       const { showsInterval } = popup;
       if (showsInterval) {
         const expires = 1000 * 3600 * 24 * showsInterval;
         LocalStorageManager.set(BLOCK_POPUPS_ALL, true, expires);
       }
-      pushToDL({ event: 'popUpVisible' });
+      pushToDL({ event: 'popupVisible' });
     } else {
       setBlockedByPopup(false);
     }
@@ -98,55 +96,45 @@ const Starlight: FC<AppProps> = ({
     setAP(allPopups.filter((p: any) => p.id !== id));
   };
 
-  const onCloseAfterSubscribe = (id: string) => {
+  const onDismiss = (
+    id: string,
+    options: onCloseOptions = {},
+  ) => {
+    setBlockedByPopup(false);
     setVisPopup(null);
     removePopup(id);
-  };
-
-  const onDismiss = ({
-    id,
-    showsNumber = 1,
-    showInterval = 7,
-  }: {
-    id: string;
-    showsNumber?: number;
-    showInterval?: number;
-  }) => {
-    setBlockedByPopup(false);
-    const attemptsLeft = parseInt(LocalStorageManager.get(`${SHOW_AGAIN_ATTEMPTS}${id}`), 10);
-    const attemptsLeftExpires = 1000 * 3600 * 24 * 365; // 1 year
-    let showsNumberCount = 0;
-    if (attemptsLeft > 0) {
-      showsNumberCount = attemptsLeft - 1;
-    } else if (Number.isNaN(attemptsLeft)) {
-      showsNumberCount = showsNumber;
-    }
-    LocalStorageManager.set(`${POPUP_WAS_DISMISSED}${id}`, true, attemptsLeftExpires);
-    LocalStorageManager.set(`${SHOW_AGAIN_ATTEMPTS}${id}`, showsNumberCount, attemptsLeftExpires);
-    const attemptsBlockExpires = 1000 * 3600 * 24 * showInterval; // interval in days (default - 1 week)
-    LocalStorageManager.set(`${SHOW_AGAIN_BLOCK}${id}`, true, attemptsBlockExpires);
-    removePopup(id);
-    pushToDL({ event: 'popUpClosed' });
-  };
-
-  const closePopupByid = (id: string, showAgain: boolean = false) => {
+    pushToDL({ event: 'popupClosed' });
+    const {
+      showsNumber = 1,
+      showInterval = 7,
+      showAgain = false,
+    } = options;
     if (showAgain) {
-      onDismiss({ id });
-    } else {
-      onCloseAfterSubscribe(id);
+      const attemptsLeft = parseInt(LocalStorageManager.get(`${SHOW_AGAIN_ATTEMPTS}${id}`), 10);
+      const attemptsLeftExpires = 1000 * 3600 * 24 * 365; // 1 year
+      let showsNumberCount = 0;
+      if (attemptsLeft > 0) {
+        showsNumberCount = attemptsLeft - 1;
+      } else if (Number.isNaN(attemptsLeft)) {
+        showsNumberCount = showsNumber;
+      }
+      LocalStorageManager.set(`${POPUP_WAS_DISMISSED}${id}`, true, attemptsLeftExpires);
+      LocalStorageManager.set(`${SHOW_AGAIN_ATTEMPTS}${id}`, showsNumberCount, attemptsLeftExpires);
+      const attemptsBlockExpires = 1000 * 3600 * 24 * showInterval; // interval in days (default - 1 week)
+      LocalStorageManager.set(`${SHOW_AGAIN_BLOCK}${id}`, true, attemptsBlockExpires);
     }
+  };
+
+  const closePopupByid = (id: string, options?: onCloseOptions) => {
+    onDismiss(id, options);
   };
 
   const renderPopup = (popup: HydratedPopup) => {
-    const PopupFC = popup.popup(popup.SLonClose);
-    return <PopupFC />
-  } 
+    const PopupFC = popup.popup;
+    return <PopupFC onClose={popup.onClose} />;
+  };
 
-  return (
-    <>
-      {visiblePopup && renderPopup(visiblePopup)}
-    </>
-  );
+  return <div>{visiblePopup && renderPopup(visiblePopup)}</div>;
 };
 
 export default Starlight;

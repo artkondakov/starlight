@@ -1,4 +1,4 @@
-import { CookieManager, LocalStorageManager } from '../storage-managers';
+import { LocalStorageManager } from '../storage-managers';
 import {
   POPUP_WAS_DISMISSED,
 } from '../constants';
