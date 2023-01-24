@@ -8,8 +8,7 @@
 Thumbs.db
 bundle-analyze.json
 report.html
-dist/index.html
-dist/test.js
+dist/
 
 # Folders
 node_modules
