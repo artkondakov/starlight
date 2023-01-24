@@ -1,0 +1,23 @@
+# OS and Editor
+._*
+.cache
+.DS_Store
+**/.DS_Store
+.idea
+.vscode
+Thumbs.db
+bundle-analyze.json
+report.html
+dist/
+
+# Folders
+node_modules
+.git
+coverage/
+.eslintcache
+__snapshots__/
+.yarn
+
+# e2e tests
+test/node_modules/
+test/cypress/screenshots/

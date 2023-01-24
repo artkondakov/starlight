@@ -1,0 +1,21 @@
+{
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "baseUrl": "src",
+    "outDir": "dist",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "es2016",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "moduleResolution": "Node",
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es5", "es2015", "es6", "dom"],
+    "sourceMap": true,
+    "declaration": true,
+    "declarationDir": "dist"
+  }
+}
