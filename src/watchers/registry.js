@@ -2,7 +2,6 @@
 import RouteWatcher from './route';
 import SessionWatcher from './session';
 import MouseWatcher from './mouse';
-import ConsentWatcher from './consent';
 
 export default [
   {
@@ -16,9 +15,5 @@ export default [
   {
     name: 'mouse',
     watcher: MouseWatcher,
-  },
-  {
-    name: 'consent',
-    watcher: ConsentWatcher,
-  },
+  }
 ];
